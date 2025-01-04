@@ -1,0 +1,302 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "description": "The dashboard provides insights of Azure Resource Graph Explorer overview, compute, Paas, networking, monitoring and security. Queries used in this Azure Monitor dashboard we sourced from the [Azure Inventory Workbook](https://github.com/scautomation/Azure-Inventory-Workbook) by Billy York. You can find more sample Azure Resource Graph queries by Billy at this [GitHub](https://github.com/scautomation/AzureResourceGraph-Examples) repository.",
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "gnetId": 14986,
+  "graphTooltip": 0,
+  "id": 46,
+  "links": [
+    {
+      "asDropdown": false,
+      "icon": "external link",
+      "includeVars": false,
+      "keepTime": false,
+      "tags": [],
+      "targetBlank": true,
+      "title": "Azure Resource Graph queries by Billy York",
+      "tooltip": "See more",
+      "type": "link",
+      "url": "https://github.com/scautomation/AzureResourceGraph-Examples"
+    }
+  ],
+  "liveNow": false,
+  "panels": [
+    {
+      "datasource": {
+        "uid": "${ds}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "inspect": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "maxscore"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 94
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "currentscore"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 137
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "unhealthy"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 116
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "id": 62,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "countRows": false,
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "showHeader": true,
+        "sortBy": []
+      },
+      "pluginVersion": "10.4.11",
+      "targets": [
+        {
+          "account": "",
+          "azureResourceGraph": {
+            "query": "SecurityResources \r\n| where type == 'microsoft.security/securescores/securescorecontrols' \r\n| extend SecureControl = properties.displayName, unhealthy = properties.unhealthyResourceCount, currentscore = properties.score.current, maxscore = properties.score.max, subscriptionId\r\n| project SecureControl , unhealthy, currentscore, maxscore, subscriptionId",
+            "resultFormat": "table"
+          },
+          "backends": [],
+          "datasource": {
+            "uid": "${ds}"
+          },
+          "dimension": "",
+          "environment": "prod",
+          "metric": "",
+          "namespace": "",
+          "queryType": "Azure Resource Graph",
+          "refId": "A",
+          "samplingType": "",
+          "service": "metric",
+          "subscriptions": [
+            "$subscriptions"
+          ],
+          "useBackends": false,
+          "useCustomSeriesNaming": false
+        }
+      ],
+      "title": "Azure Security Center Secure Controls Score by Controls",
+      "type": "table"
+    },
+    {
+      "datasource": {
+        "uid": "${ds}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "left",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "inspect": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 22,
+        "x": 0,
+        "y": 8
+      },
+      "id": 61,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "countRows": false,
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "showHeader": true
+      },
+      "pluginVersion": "10.4.11",
+      "targets": [
+        {
+          "account": "",
+          "azureResourceGraph": {
+            "query": "securityresources\r\n| where type == \"microsoft.security/securescores\"\r\n| extend subscriptionSecureScore = round(100 * bin((todouble(properties.score.current))/ todouble(properties.score.max), 0.001))\r\n| where subscriptionSecureScore > 0\r\n| project subscriptionSecureScore, subscriptionId\r\n| order by subscriptionSecureScore asc",
+            "resultFormat": "table"
+          },
+          "backends": [],
+          "datasource": {
+            "uid": "${ds}"
+          },
+          "dimension": "",
+          "environment": "prod",
+          "metric": "",
+          "namespace": "",
+          "queryType": "Azure Resource Graph",
+          "refId": "A",
+          "samplingType": "",
+          "service": "metric",
+          "subscriptions": [
+            "$subscriptions"
+          ],
+          "useBackends": false,
+          "useCustomSeriesNaming": false
+        }
+      ],
+      "title": "Azure Security Center Secure Store by Subscription",
+      "type": "table"
+    }
+  ],
+  "refresh": "",
+  "schemaVersion": 39,
+  "tags": [],
+  "templating": {
+    "list": [
+      {
+        "current": {
+          "selected": false,
+          "text": "Azure Monitor",
+          "value": "azure-monitor-oob"
+        },
+        "hide": 0,
+        "includeAll": false,
+        "label": "Datasource",
+        "multi": false,
+        "name": "ds",
+        "options": [],
+        "query": "grafana-azure-monitor-datasource",
+        "queryValue": "",
+        "refresh": 1,
+        "regex": "",
+        "skipUrlSync": false,
+        "type": "datasource"
+      },
+      {
+        "current": {
+          "selected": false,
+          "text": "CS-A3I-AILIBRARIAN-SHARED-01",
+          "value": "61e6a2d3-ac7a-40ec-9fb2-b9c53fad5e72"
+        },
+        "datasource": {
+          "uid": "${ds}"
+        },
+        "definition": "Subscriptions()",
+        "hide": 0,
+        "includeAll": false,
+        "label": "Subscription(s)",
+        "multi": true,
+        "name": "subscriptions",
+        "options": [],
+        "query": "Subscriptions()",
+        "refresh": 1,
+        "regex": "",
+        "skipUrlSync": false,
+        "sort": 5,
+        "type": "query"
+      }
+    ]
+  },
+  "time": {
+    "from": "now-1h",
+    "to": "now"
+  },
+  "timepicker": {},
+  "timezone": "",
+  "title": "Azure Security Center",
+  "uid": "Mtwt2BV7kffghh",
+  "version": 5,
+  "weekStart": ""
+}
